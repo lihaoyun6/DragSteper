@@ -5,9 +5,9 @@ import SwiftUI
 
 public struct DragSteper: View {
     @Binding var value: Int
-    @State var minValue: Int? = nil
-    @State var maxValue: Int? = nil
-    @State var haptic: Bool = false
+    var minValue: Int?
+    var maxValue: Int?
+    var haptic: Bool
     
     @State private var offset: Double = 0
     @State private var dotOffset: Double = 0
@@ -17,6 +17,13 @@ public struct DragSteper: View {
     @State private var noHaptic: Bool = false
     
     private let hapticManager = NSHapticFeedbackManager.defaultPerformer
+    
+    public init(value: Binding<Int>, minValue: Int? = nil, maxValue: Int? = nil, haptic: Bool = false) {
+        self._value = value
+        self.minValue = minValue
+        self.maxValue = maxValue
+        self.haptic = haptic
+    }
     
     public var body: some View {
         HStack(spacing: 2) {
