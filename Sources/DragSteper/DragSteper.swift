@@ -4,6 +4,8 @@
 import SwiftUI
 
 public struct DragSteper: View {
+    @Environment(\.presentationMode) var presentationMode
+    
     @Binding var value: Int
     var minValue: Int?
     var maxValue: Int?
@@ -12,7 +14,6 @@ public struct DragSteper: View {
     @State private var offset: Double = 0
     @State private var dotOffset: Double = 0
     @State private var origin: Int = 0
-    @State private var dotLocked: Bool = false
     @State private var locked: Bool = false
     @State private var noHaptic: Bool = false
     
@@ -84,31 +85,16 @@ public struct DragSteper: View {
                         DragGesture()
                             .onChanged { newValue in
                                 let width = newValue.translation.width
-                                value = origin - Int(floor(width / 7.5))
+                                value = origin - Int(width / 7.5)
                                 value = max(minValue ?? value, min(maxValue ?? value, value))
-                                if let maxV = maxValue, value >= maxV {
-                                    if dotLocked { return }
-                                    dotLocked = true
-                                    offset = 0
-                                    dotOffset = max(-37.5, Double(Int(width / 7.5)) * 7.5)
-                                    return
-                                }
-                                if let minV = minValue, value <= minV {
-                                    if dotLocked { return }
-                                    dotLocked = true
-                                    offset = 0
-                                    dotOffset = min(37.5, Double(Int(width / 7.5)) * 7.5)
-                                    return
-                                }
-                                dotLocked = false
+                                if let maxV = maxValue, value >= maxV { presentationMode.wrappedValue.dismiss() }
+                                if let minV = minValue, value <= minV { presentationMode.wrappedValue.dismiss() }
                                 offset = width
                             }
                             .onEnded { newValue in
                                 withAnimation(.easeOut(duration: 0.2)) {
                                     offset = 0
                                     origin = value
-                                    if let max = maxValue, value >= max { return }
-                                    if let min = minValue, value <= min { return }
                                     dotOffset += newValue.translation.width
                                     dotOffset = Double(Int(dotOffset / 7.5)) * 7.5
                                 }
